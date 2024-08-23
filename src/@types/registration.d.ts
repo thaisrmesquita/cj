@@ -3,6 +3,6 @@ export type Registration = {
   cpf: string;
   email: string;
   employeeName: string;
-  id: string;
+  id?: string;
   status: string;
 };

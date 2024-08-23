@@ -14,8 +14,6 @@ export const useRegistrations = () => {
 
   const updateRegistrations = useMutation({
     mutationFn: async (info: { data: Registration; newStatus: string }) => {
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-
       return apiInstance.put(`/registrations/${info.data.id}`, {
         ...info.data,
         status: info.newStatus,
@@ -40,5 +38,9 @@ export const useRegistrations = () => {
     },
   });
 
-  return { getRegistrations, updateRegistrations };
+  const createRegistration = async (registration: Registration) => {
+    await apiInstance.post("/registrations", { ...registration });
+  };
+
+  return { getRegistrations, updateRegistrations, createRegistration };
 };

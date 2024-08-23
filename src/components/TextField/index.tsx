@@ -1,4 +1,8 @@
-import React, { InputHTMLAttributes } from "react";
+import React, {
+  InputHTMLAttributes,
+  forwardRef,
+  ForwardRefRenderFunction,
+} from "react";
 import styled from "styled-components";
 
 export const Input = styled.input`
@@ -13,7 +17,7 @@ export const Input = styled.input`
   font-size: 16px;
   line-height: 18px;
   font-weight: normal;
-  border-radius:8px;
+  border-radius: 8px;
   :focus {
     outline: none;
     border: 1px solid #007c89;
@@ -25,14 +29,19 @@ type Props = {
   error?: string;
 } & InputHTMLAttributes<any>;
 
-const TextField = (props: Props) => {
+const TextFieldComponent: ForwardRefRenderFunction<HTMLInputElement, Props> = (
+  props: Props,
+  ref
+) => {
   return (
     <div>
       <label htmlFor={props.id}>{props.label}</label>
-      <Input {...props} />
-      <span style={{fontSize: 12, color: 'red'}}>{props.error}</span>
+      <Input {...props} ref={ref} />
+      <span style={{ fontSize: 12, color: "red" }}>{props.error}</span>
     </div>
   );
 };
+
+const TextField = forwardRef(TextFieldComponent);
 
 export default TextField;
