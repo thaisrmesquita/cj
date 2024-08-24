@@ -8,15 +8,22 @@ import {
 } from "react-icons/hi";
 import { Registration } from "~/@types/registration";
 import { useRegistrations } from "~/hooks/useRegistrations";
+import { useContext } from "react";
+import { ModalContext } from "~/context/modal";
 
 type RegistrationCardProps = {
   registration: Registration;
 };
 
 const RegistrationCard = ({ registration }: RegistrationCardProps) => {
-  const { updateRegistrations } = useRegistrations();
-  const { mutateAsync } = updateRegistrations;
+  const { onOpen, setRegistrationModalToChange } = useContext(ModalContext);
+
   const { employeeName, email, admissionDate } = registration;
+
+  const openModalConfirm = (status: string) => {
+    setRegistrationModalToChange({ ...registration, status });
+    onOpen();
+  };
 
   const renderButtons = () => {
     const toReview = registration.status === "REVIEW";
@@ -24,17 +31,13 @@ const RegistrationCard = ({ registration }: RegistrationCardProps) => {
       <>
         <ButtonSmall
           bgcolor="rgb(255, 145, 154)"
-          onClick={() =>
-            mutateAsync({ data: registration, newStatus: "REPROVED" })
-          }
+          onClick={() => openModalConfirm("REPROVED")}
         >
           Reprovar
         </ButtonSmall>
         <ButtonSmall
           bgcolor="rgb(155, 229, 155)"
-          onClick={() =>
-            mutateAsync({ data: registration, newStatus: "APPROVED" })
-          }
+          onClick={() => openModalConfirm("APPROVED")}
         >
           Aprovar
         </ButtonSmall>
@@ -43,9 +46,7 @@ const RegistrationCard = ({ registration }: RegistrationCardProps) => {
       <>
         <ButtonSmall
           bgcolor="#ff8858"
-          onClick={() =>
-            mutateAsync({ data: registration, newStatus: "REVIEW" })
-          }
+          onClick={() => openModalConfirm("REVIEW")}
         >
           Revisar novamente
         </ButtonSmall>
@@ -69,7 +70,7 @@ const RegistrationCard = ({ registration }: RegistrationCardProps) => {
       </S.IconAndText>
       <S.Actions>
         {renderButtons()}
-        <HiOutlineTrash />
+        <HiOutlineTrash onClick={() => openModalConfirm("DELETE")} />
       </S.Actions>
     </S.Card>
   );

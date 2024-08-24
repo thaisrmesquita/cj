@@ -10,6 +10,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isCPF, formatToCPF } from "brazilian-values";
 import { useRegistrations } from "~/hooks/useRegistrations";
+import { useContext } from "react";
+import { ModalContext } from "~/context/modal";
+import Modal from "~/components/Modal";
+import { toast } from "react-toastify";
 
 const registrationFormSchema = z.object({
   admissionDate: z
@@ -27,16 +31,21 @@ export type RegistrationFormSchemaType = z.infer<typeof registrationFormSchema>;
 
 const NewUserPage = () => {
   const { createRegistration } = useRegistrations();
+  const { isOpen, onClose, onOpen } = useContext(ModalContext);
 
   const history = useHistory();
   const goToHome = () => {
     history.push(routes.dashboard);
   };
 
-  const { register, handleSubmit, formState } =
+  const { register, handleSubmit, formState, watch } =
     useForm<RegistrationFormSchemaType>({
       resolver: zodResolver(registrationFormSchema),
     });
+
+  const formValues = watch();
+
+  const hasEmptyInput = Object.values(formValues).some((value) => value === "");
 
   const { errors } = formState;
 
@@ -52,6 +61,12 @@ const NewUserPage = () => {
       };
 
       await createRegistration(registration);
+
+      toast.success(`Funcionário ${watch("employeeName")} criado com sucesso`, {
+        position: "bottom-left",
+        theme: "colored",
+      });
+
       goToHome();
     } catch (error) {
       alert(error);
@@ -99,8 +114,16 @@ const NewUserPage = () => {
           error={errors.admissionDate?.message}
           {...register("admissionDate")}
         />
-        <Button onClick={() => onSubmit()}>Cadastrar</Button>
+        <Button onClick={() => onOpen()} disabled={hasEmptyInput}>
+          Cadastrar
+        </Button>
       </S.Card>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        newUserModal={watch("employeeName")}
+        onSubmit={onSubmit}
+      />
     </S.Container>
   );
 };
